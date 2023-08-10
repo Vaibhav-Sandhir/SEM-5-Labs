@@ -51,7 +51,7 @@ int main(){
 		client = sizeof(client);
 		int new_socket_id = accept(socket_id, (struct sockaddr*)&clientaddress, &client);
 		
-		n = read(new_socket_id, buffer, sizeof(buffer));
+		read(new_socket_id, buffer, sizeof(buffer));
 		
 		if(strcmp(buffer, "Stop") == 0)
 			break;
