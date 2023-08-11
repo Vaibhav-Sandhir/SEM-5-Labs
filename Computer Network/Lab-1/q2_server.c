@@ -34,7 +34,7 @@ int main(){
 	serveraddress.sin_addr.s_addr = inet_addr("172.20.10.3");
 	serveraddress.sin_port = htons(PORTNO);
 	
-	bind(socket_id, (struct sockaddr*)&serveraddress, sizeof(serveraddress));
+	bind(socket_id, (struct sockaddr *)&serveraddress, sizeof(serveraddress));
 	listen(socket_id, 5);
 	
 	while(1){
