@@ -1,44 +1,31 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <dirent.h>
-#include <unistd.h>
-
-void printdir(char path[], int depth);
-
-int main(){
-	char path[] = "/home/kali/Desktop/SEM-5-Labs/Operating System/Lab 2/q2_dir";
-	
-	printdir(path,1);
-		
+#include<unistd.h>
+#include<stdio.h>
+#include<dirent.h>
+#include<string.h>
+#include<sys/stat.h>
+#include<stdlib.h>
+void printdir(char *dir, int depth) {
+    DIR *dp;
+    struct dirent *entry;
+    struct stat statbuf;
+    if((dp = opendir(dir)) == NULL) {
+        fprintf(stderr,"cannot open directory: %s\n", dir);
+        return;
+    }
+    chdir(dir);
+    while((entry = readdir(dp)) != NULL) {
+        lstat(entry->d_name,&statbuf);
+        if(S_ISDIR(statbuf.st_mode)) {
+            if(strcmp(".",entry->d_name) == 0 || strcmp("..",entry->d_name) == 0)
+                continue;
+            printf("%*s%s/\n",depth,"",entry->d_name);
+            printdir(entry->d_name,depth+4);
+        }
+        else printf("%*s%s\n",depth,"",entry->d_name);
+    }
+    chdir("..");
+    closedir(dp);
 }
-
-void printdir(char path[], int depth){
-	DIR* directory = opendir(path);
-	
-	if(directory == NULL){
-		printf("\nError in opening directory");
-		exit(1);
-	}
-
-	chdir(path);
-	struct dirent* entry = readdir(directory);
-	struct stat statbuf;
-	
-	while(entry != NULL){
-		lstat(entry->d_name, &statbuf);
-		if(S_ISDIR(statbuf.st_mode)){
-			if(strcmp(".", entry->d_name) == 0 || strcmp("..", entry->d_name) == 0)
-				continue;
-			printf("\nDepth - %d Directory - %s", depth, entry->d_name);
-			printdir(entry->d_name, depth + 1);	
-		}
-		else{
-			printf("\nDepth - %d File - %s", depth, entry->d_name);	
-		}
-	}
-	chdir("..");
-	closedir(directory);
+int main() {
+    printdir("/home/kali/Desktop/SEM-5-Labs", 0);
 }
