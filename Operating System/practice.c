@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <dirent.h>
+#include <fcntl.h>
 
 int main(){
 	char buffer[256];
@@ -15,6 +16,10 @@ int main(){
 	int n = mkdir(buffer, 0777);
 	//n = rmdir(buffer);
 	DIR* directory = opendir(buffer);
-	struct dirent* entry = 
+	chdir(buffer);
+	int file1 = open("prac1.txt", O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
+	int file2 = open("prac2.txt", O_CREAT | O_WRONLY, S_IRUSR | S_IWUSR);
+	struct dirent* entry = readdir(directory);
+	printf("\n%s", entry->d_name);
 }
 
