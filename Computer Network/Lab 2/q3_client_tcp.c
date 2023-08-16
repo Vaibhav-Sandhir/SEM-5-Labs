@@ -11,7 +11,7 @@ int main(){
 	int socket_id = socket(AF_INET, SOCK_STREAM, 0);
 	struct sockaddr_in address;
 	address.sin_family = AF_INET;
-	address.sin_addr.s_addr = inet_addr("10.52.8.115");
+	address.sin_addr.s_addr = inet_addr("10.145.5.228");
 	address.sin_port = htons(PORTNO);
 	
 	int result = connect(socket_id, (struct sockaddr*)&address, sizeof(address));
@@ -23,6 +23,6 @@ int main(){
 	
 	char buffer[256];
 	recv(socket_id, buffer, sizeof(buffer), 0);
-	
-	printf("%s", buffer);
+	printf("\n%s", buffer);
+	exit(0);
 }

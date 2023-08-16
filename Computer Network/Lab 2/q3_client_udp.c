@@ -12,19 +12,15 @@ int main(){
 	int socket_id = socket(AF_INET, SOCK_DGRAM, 0);
 	struct sockaddr_in serveraddress;
 	serveraddress.sin_family = AF_INET;
-	serveraddress.sin_addr.s_addr = inet_addr("10.52.8.115");
+	serveraddress.sin_addr.s_addr = inet_addr("10.145.5.228");
 	serveraddress.sin_port = htons(PORTNO);	
-	
-	bind(socket_id, (struct sockaddr*)&serveraddress, sizeof(serveraddress));
-	
-	while(1){
-		char buffer[256] = "Hello form UDP";
-		socklen_t server = sizeof(serveraddress);
-					if(sendto(socket_id, buffer, sizeof(buffer), 0, (struct sockaddr*)&serveraddress, server) == -1){
-				perror("sendto");
-				exit(-1);
-			}
-	}
+		
+	char buffer[256] = "Request from UDP";
+	char new[256];
+	socklen_t server = sizeof(serveraddress);
+	sendto(socket_id, buffer, sizeof(buffer), 0, (struct sockaddr*)&serveraddress, server);
+	recvfrom(socket_id, new, 256, 0, (struct sockaddr*)&serveraddress, &server);
+	printf("\n%s", new);
 	close(socket_id);
 	return 0;
 }
