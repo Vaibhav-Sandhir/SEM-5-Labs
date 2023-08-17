@@ -18,11 +18,10 @@ int isDuplicate(char ch, char unique[], int ind){
 }
 
 int main(){
-	// WORKS ONLY FOR WORDS IF GIVEN SENTENCES THOUGH OUTPUT IS CORRECT SEQUENCE IS MESSED UP
 	int socket_id = socket(AF_INET, SOCK_STREAM, 0);
 	struct sockaddr_in serveraddress;
 	serveraddress.sin_family = AF_INET;
-	serveraddress.sin_addr.s_addr = inet_addr("10.145.5.228");
+	serveraddress.sin_addr.s_addr = inet_addr("10.52.8.115");
 	serveraddress.sin_port = htons(PORTNO);
 	
 	bind(socket_id, (struct sockaddr*)&serveraddress, sizeof(serveraddress));

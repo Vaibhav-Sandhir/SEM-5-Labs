@@ -14,7 +14,7 @@ int main(){
 		int socket_id = socket(AF_INET, SOCK_STREAM, 0);
 		struct sockaddr_in address;
 		address.sin_family = AF_INET;
-		address.sin_addr.s_addr = inet_addr("10.145.5.228");
+		address.sin_addr.s_addr = inet_addr("10.52.8.115");
 		address.sin_port = htons(PORTNO);
 		int res = connect(socket_id, (struct sockaddr*)&address, sizeof(address));
 	
@@ -26,7 +26,7 @@ int main(){
 		char result[256];
 		
 		printf("\nEnter String: ");
-		scanf("%s", string);
+		scanf("%[^\n]%*c", string);
 		
 		if(strcmp(string, "Stop") == 0)
 			exit(0);
