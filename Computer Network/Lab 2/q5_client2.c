@@ -24,7 +24,7 @@ int main(){
 		char string[256];
 		char result[256];
 		printf("\nEnter String: ");
-		scanf("%s", string);
+		scanf("%[^\n]%*c", string);
 		
 		if(strcmp(string, "Stop") == 0)
 			exit(0);

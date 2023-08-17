@@ -9,7 +9,6 @@
 #define PORTNO 10201
 
 int main(){	
-	int done = 1;
 	while(1){
 		int socket_id = socket(AF_INET, SOCK_STREAM, 0);
 		struct sockaddr_in address;

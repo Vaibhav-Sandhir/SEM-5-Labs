@@ -12,7 +12,7 @@ int main(){
 	int socket_id = socket(AF_INET, SOCK_DGRAM, 0);
 	struct sockaddr_in serveraddress;
 	serveraddress.sin_family = AF_INET;
-	serveraddress.sin_addr.s_addr = inet_addr("10.145.5.228");
+	serveraddress.sin_addr.s_addr = inet_addr("172.20.10.8");
 	serveraddress.sin_port = htons(PORTNO);	
 		
 	char buffer[256] = "Request from UDP";
