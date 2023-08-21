@@ -3,6 +3,10 @@
 #include <stdlib.h>
 
 int ind = 0;
+char *keywords[] = { "auto", "break", "case", "char", "const", "continue", "default", "do", "double", "else", "enum", "extern", "float", "for", "goto","if", "int", "long", "register", "return", "short", "signed",
+    		             "sizeof", "static", "struct", "switch", "typedef", "union", "unsigned",
+    			     "void", "volatile", "while"
+			};
 
 typedef struct Token{
 	int row_no;
@@ -31,6 +35,21 @@ int isOtherArithmop(char c){
 	return 0;
 }
 
+int isOtherSpecialSymbol(char c){
+	if(c != '$' && c != '@' && c != '(' && c != ')' && c != '[' && c != ']' && c != '{' && c != '}' && c != '<' && c != '>'){
+		return 1;
+	}
+	return 0;
+}
+
+int isOtherNumerical(char c){
+	if(c >= 48 && c <= 57){
+		return 0;
+	}
+	
+	return 1;
+}
+
 int isStringLiteral(char line[], int i){
 	int end_index = i;
 	if(line[end_index] == '"'){
@@ -39,6 +58,15 @@ int isStringLiteral(char line[], int i){
 			end_index++;
 		}
 	return end_index;
+}
+
+int isKeyword(const char *word) {
+    for (int i = 0; i < 32; i++) {
+        if (strcmp(word, keywords[i]) == 0) {
+            return 1; 
+        }
+    }
+    return 0; 
 }
 
 void getRelop(char line[], int row_no, Token token[256]){	
@@ -184,6 +212,129 @@ void getStringLiteral(char line[], int row_no, Token token[256]){
 	}
 }
 
+void getSpecialSymbol(char line[], int row_no, Token token[256]){
+	for(int i = 0; i < strlen(line); i++){
+		i = isStringLiteral(line, i);
+		
+		if(isOtherSpecialSymbol(line[i])){
+			continue;
+		}
+		
+		if(line[i] == '$'){
+			strcpy(token[ind].type, "SC:$");
+			token[ind].row_no = row_no;
+			token[ind].column_no = i;
+			ind++;
+		}
+		
+		if(line[i] == '@'){
+			strcpy(token[ind].type, "SC:@");
+			token[ind].row_no = row_no;
+			token[ind].column_no = i;
+			ind++;
+		}
+		
+		if(line[i] == '['){
+			strcpy(token[ind].type, "SC:[");
+			token[ind].row_no = row_no;
+			token[ind].column_no = i;
+			ind++;
+		}
+		
+		if(line[i] == ']'){
+			strcpy(token[ind].type, "SC:]");
+			token[ind].row_no = row_no;
+			token[ind].column_no = i;
+			ind++;
+		}
+		
+		if(line[i] == '{'){
+			strcpy(token[ind].type, "SC:{");
+			token[ind].row_no = row_no;
+			token[ind].column_no = i;
+			ind++;
+		}	
+		
+		if(line[i] == '}'){
+			strcpy(token[ind].type, "SC:}");
+			token[ind].row_no = row_no;
+			token[ind].column_no = i;
+			ind++;
+		}
+		
+		if(line[i] == '('){
+			strcpy(token[ind].type, "SC:(");
+			token[ind].row_no = row_no;
+			token[ind].column_no = i;
+			ind++;
+		}
+		
+		if(line[i] == ')'){
+			strcpy(token[ind].type, "SC:)");
+			token[ind].row_no = row_no;
+			token[ind].column_no = i;
+			ind++;
+		}
+		
+		if(line[i] == '<'){
+			strcpy(token[ind].type, "SC:<");
+			token[ind].row_no = row_no;
+			token[ind].column_no = i;
+			ind++;
+		}
+		
+		if(line[i] == '>'){
+			strcpy(token[ind].type, "SC:>");
+			token[ind].row_no = row_no;
+			token[ind].column_no = i;
+			ind++;
+		}
+		
+	}
+}
+
+void getNumericalConstant(char line[], int row_no, Token token[256]){
+	for(int i = 0; i < strlen(line); i++){
+		i = isStringLiteral(line, i);
+		
+		if(isOtherNumerical(line[i])){
+			continue;
+		}
+		char number[20] = "";
+		int j = 0;
+		
+		if(i >=1 && !((line[i - 1] >= 97 && line[i - 1] <= 122) || (line[i - 1] >= 65 && line[i - 1] <= 90))){
+			while(!isOtherNumerical(line[i])){
+				number[j++] = line[i++];
+			}
+			strcat(token[ind].type, "NUM:");
+			strcat(token[ind].type, number);
+			token[ind].row_no = row_no;
+			token[ind].column_no = i;
+			ind++;
+			continue;
+		}
+	}
+}
+
+void getKeywords(char line[], int row_no, Token token[256]){
+	char *word = strtok(line, " \t\n");
+	
+	int column = 0;
+
+    	while (word != NULL) {
+    		column += strlen(word) + 1;
+        	if (isKeyword(word)) {
+        		strcat(token[ind].type, "KW:");
+            		strcat(token[ind].type, word);
+			token[ind].row_no = row_no;
+			token[ind].column_no = column;
+			ind++;
+        	}
+        	word = strtok(NULL, " \t\n");
+    	}
+}
+
 int sortTokens(Token token[]){
 	for(int i = 0; i < ind - 1; i++){
 		for(int j = 0; j < ind - i - 1; j++){
@@ -212,6 +363,9 @@ int main(){
 		getLogop(line, row, token);
 		getArithmop(line, row, token);
 		getStringLiteral(line, row, token);
+		getNumericalConstant(line, row, token);
+		getSpecialSymbol(line, row, token);
+		getKeywords(line, row, token);
 		row++;
 	}
 	printf("\n%d\n", ind);
