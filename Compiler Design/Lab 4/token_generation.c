@@ -1,20 +1,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "token_generation.h"
 
 char *keywords[] = { "auto", "break", "case", "char", "const", "continue", "default", "do", "double", "else", "enum", "extern", "float", "for", "goto","if", "int", "long", "register", "return",   "short", "signed", "sizeof", "static", "struct", "switch", "typedef", "union", "unsigned", "void", "volatile", "while"};
-
-typedef struct Token{
-	int row_no;
-	int column_no;
-	char type[256];
-	char name[256];
-} Token;
 
 Token token[256];
 int ind = 0;
 int id_no = 1;
 char id_str[20];
+int send_count = 0;
 
 int isOtherRelop(char c){
 	if(c != '<' && c != '>' && c != '=' && c != '!'){
@@ -345,7 +340,12 @@ int sortTokens(Token token[]){
 	}
 }
 
-int main(){
+Token getNextToken(){
+	if(send_count < ind)
+		return token[send_count++];		
+}
+
+void tokenCreation(){
 	char line[256];
 	int row = 1;
 	FILE* input = fopen("input.c", "r");
@@ -365,8 +365,4 @@ int main(){
 		row++;
 	}
 	sortTokens(token);
-	
-	for(int i = 0; i < ind; i++){
-		printf("\n<%s, %s, %d, %d>", token[i].type, token[i].name, token[i].row_no, token[i].column_no);
-	}
 }
