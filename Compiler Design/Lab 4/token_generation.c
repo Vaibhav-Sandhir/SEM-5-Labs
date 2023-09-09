@@ -350,7 +350,7 @@ Token getNextToken(){
 void tokenCreation(){
 	char line[512];
 	int row = 1;
-	FILE* input = fopen("input.c", "r");
+	FILE* input = fopen("input_3.c", "r");
 	if(input == NULL){
 		printf("\nError in opening file");
 		exit(1);
@@ -369,6 +369,160 @@ void tokenCreation(){
 	sortTokens(token);
 }
 
-void preprocessing(){
+void removeComments(){
+	FILE *fa, *fb;
+	int ca, cb;
+	fa = fopen("input.c", "r");
+	fb = fopen("input_1.c", "w");
+	ca = getc(fa);
+	while (ca != EOF)
+	{
+	if(ca == '"'){
+		putc(ca, fb);
+		ca = getc(fa);
+		while(ca != '"'){
+			putc(ca, fb);
+			ca = getc(fa);	
+		}
+	}
+	if(ca==' ')
+	{
+	putc(ca,fb);
+	while(ca==' ')
+	ca = getc(fa);
+	}
+	if (ca=='/')
+	{
+	cb = getc(fa);
+	if (cb == '/')
+	{
+	while(ca != '\n')
+	ca = getc(fa);
+	}
+	else if (cb == '*')
+	{
+	do
+	{
+	while(ca != '*')
+	ca = getc(fa);
+	ca = getc(fa);
+	} while (ca != '/');
+	}
+	else
+	{
+	putc(ca,fb);
+	putc(cb,fb);
+	}
+	}
+	else putc(ca,fb);
+	ca = getc(fa);
+	}
+	fclose(fa);
+	fclose(fb);
+}
+
+void removeSpaces(){
+	char c;
+	FILE* source;
+	FILE* destination;
 	
+	source = fopen("input_1.c", "r");
+	destination = fopen("input_2.c", "w");
+	
+	c = fgetc(source);
+	
+	while(c != EOF){
+		if(c == '"'){
+		putc(c, destination);
+		c = getc(source);
+		while(c != '"'){
+			putc(c, destination);
+			c = getc(source);	
+		}
+	}
+	
+		if(c == ' '){
+			c = fgetc(source);
+			while(c == ' '){
+				c = fgetc(source);
+			}
+			fputc(' ', destination);
+		}
+		
+		if(c == '\t'){
+			fputc(' ', destination);	
+		}
+		
+		else{
+			fputc(c, destination);
+		}
+		
+		c = fgetc(source);
+	}
+	fclose(source);
+	fclose(destination);
+}
+
+void removeDirectives(){
+	char c; 
+	FILE* source;
+	FILE* destination;
+	
+	source = fopen("input_2.c", "r");
+	destination = fopen("input_3.c", "w");
+	
+	
+	int flag = 1;
+	c = fgetc(source);
+	while(c != EOF){
+		long position = ftell(source);
+		if (c == 'm' && fgetc(source) == 'a' && fgetc(source) == 'i' && fgetc(source) == 'n' && fgetc(source) == '(') {
+                	fputs("main(", destination);
+                	while (c != EOF) {
+                    		c = fgetc(source);
+                    		fputc(c, destination);
+                    	}     
+                	break;
+            	} 
+            	else {
+                	fseek(source, position, SEEK_SET);
+            	}
+		if(c == '"'){
+			fputc(c, destination);
+			c = fgetc(source);
+			while(c != '"'){
+				fputc(c, destination);
+				c = fgetc(source);
+			}
+			fputc(c, destination);
+			c = fgetc(source);
+			continue;
+		}
+		
+		if(c == '\n'){
+			flag = 1;
+		}
+			
+		else if(c == '#' && flag == 1){
+			while(c != '\n'){
+				c = fgetc(source);
+				}
+			c = fgetc(source);
+			continue;	
+		}
+		
+		else if(c != ' ' && c != '\t'){
+			flag = 0;
+		}
+		fputc(c, destination);
+		c = fgetc(source);
+		}
+	fclose(source);
+	fclose(destination);	
+	}
+
+void preprocessing(){
+	removeComments();
+	removeSpaces();
+	removeDirectives();
 }
