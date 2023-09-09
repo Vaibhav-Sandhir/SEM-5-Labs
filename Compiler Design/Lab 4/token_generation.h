@@ -13,6 +13,7 @@ extern int ind;
 
 void tokenCreation();
 Token getNextToken();
+void preprocessing();
 
 #endif
 

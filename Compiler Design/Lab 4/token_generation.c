@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <ctype.h>
 #include "token_generation.h"
 
 char *keywords[] = { "auto", "break", "case", "char", "const", "continue", "default", "do", "double", "else", "enum", "extern", "float", "for", "goto","if", "int", "long", "register", "return",   "short", "signed", "sizeof", "static", "struct", "switch", "typedef", "union", "unsigned", "void", "volatile", "while"};
 
-Token token[256];
+Token token[512];
 int ind = 0;
 int id_no = 1;
 char id_str[20];
@@ -174,7 +176,7 @@ void getStringLiteral(char line[], int row_no){
 			literal[k++] = line[j];
 		}
 		literal[k] = '\0';
-		makeToken(literal,"String_Literal", row_no, i);
+		makeToken(literal,"String_Literal", row_no, i + 1);
 		ind++;
 		i = end_index;	
 	}
@@ -346,14 +348,14 @@ Token getNextToken(){
 }
 
 void tokenCreation(){
-	char line[256];
+	char line[512];
 	int row = 1;
 	FILE* input = fopen("input.c", "r");
 	if(input == NULL){
 		printf("\nError in opening file");
 		exit(1);
 	}
-	while(fgets(line, 256, input)){
+	while(fgets(line, 512, input)){
 		getRelop(line, row);
 		getLogop(line, row);
 		getArithmop(line, row);
@@ -365,4 +367,8 @@ void tokenCreation(){
 		row++;
 	}
 	sortTokens(token);
+}
+
+void preprocessing(){
+	
 }

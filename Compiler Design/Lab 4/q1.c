@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <ctype.h>
 #include "token_generation.h"
 
 typedef struct ST_row{
@@ -22,6 +24,10 @@ long long compute_hash(char string[]){
 	long long power = 1;
 	int len = strlen(string);
 	
+	for (int i = 0; i < len; i++) {
+        	string[i] = tolower((unsigned char)string[i]);
+    	}
+	
 	for(int i = 0; i < len; i++){
 		char c = string[i];
 		hash_value = (hash_value + (c - 'a'  + 1) * power) % m;
@@ -42,6 +48,9 @@ int containsKey(char string[]){
 
 void display(char string[]){
 	long long hash_value = compute_hash(string);
+	if(strcmp(st[hash_value].data_type, "") == 0){
+		strcpy(st[hash_value].data_type, "--");
+	}
 	if(containsKey(string)){
 		printf("%d\t%s\t%s\t\t%s         \t%s\t%d\n", st[hash_value].serial_number, st[hash_value].lexeme_name, st[hash_value].return_type, st[hash_value].data_type, st[hash_value].nature, st[hash_value].no_arguments);
 	}
@@ -51,16 +60,23 @@ void display(char string[]){
 }
 
 int main(){
+	preprocessing();
 	tokenCreation();
 	int total_tokens = ind;
 	Token token[ind];
 	for(int i = 0; i < total_tokens; i++){
 		token[i] = getNextToken();
 	}
+	for(int i = 0; i < ind; i++){
+		printf("\n<%s, %d, %d>", token[i].type, token[i].row_no, token[i].column_no);
+	}
+	printf("\n");
 	Token curr;
 	Token prev;
 	Token next;
+	int main_flag = 0;
 	char type[256];
+	printf("SN\tName\tReturn Type\tData Type\tNature\t\tNumber of Argumentss\n");
 	for(int i = 0; i < total_tokens; i++){
 		curr = token[i];
 		if(strstr(curr.type, "id") == NULL){
@@ -78,21 +94,21 @@ int main(){
 				strcpy(st[hash_index].nature, "Function");
 				strcpy(st[hash_index].data_type, "--");
 				prev = token[i - 1];
-				strcpy(st[hash_index].return_type, prev.type);
+				if(strcmp(curr.name, "printf") == 0 || strcmp(curr.name, "scanf") == 0){
+					strcpy(st[hash_index].return_type, "NULL");
+				}
+				else{
+					strcpy(st[hash_index].return_type, prev.type);
+				}
 				int arguments = 0;
 				next = token[++j];
-				int flag = 0;
 				while(strcmp(next.type, ")") != 0){
-					flag = 1;
-					if(strcmp(next.type, ",") == 0){
+					if(strstr(next.type, "id") != NULL){
 						arguments++;
 					}
 					next = token[++j];
 				}
-				if(flag)
-					st[hash_index].no_arguments = arguments + 1;
-				else
-					st[hash_index].no_arguments = arguments;	
+				st[hash_index].no_arguments = arguments;	
 			}
 			else{
 				strcpy(st[hash_index].nature, "Variable");
@@ -104,12 +120,7 @@ int main(){
 				}
 				strcpy(st[hash_index].data_type, token[k].type);
 			}
+		display(curr.name);
 		no++;
 	}
-	printf("SN\tName\tReturn Type\tData Type\tNature\t\tNumber of Arguments\n");
-	display("main");
-	display("x");
-	display("y");
-	display("a");
-	display("b");
 }
