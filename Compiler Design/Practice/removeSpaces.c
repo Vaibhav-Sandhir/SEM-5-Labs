@@ -35,13 +35,5 @@ void main(){
 	}
 	fclose(source);
 	fclose(destination);
-	source = fopen("input_2.c", "r");
-	destination = fopen("input_3.c", "w");
-	char line[512];
-	
-	while(fgets(line, 512, source)){
-		if(strlen(line) == 1)
-			continue;
-		fputs(line, destination);	
-	}
 }
+
