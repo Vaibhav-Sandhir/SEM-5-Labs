@@ -20,15 +20,11 @@ long long compute_hash(char str[]){
 	int p = 31;
 	int m = 1000003;
 	int n = strlen(str);
-	long long power = 0;
+	long long power = 1;
 	long long hash_value = 0;
 	
-	//for (int i = 0; i < n; i++) {
-        //	str[i] = tolower((unsigned char)str[i]);
-    	//}
-	
 	for(int i = 0; i < n; i++){
-		char c = str[i];
+		char c = tolower((unsigned char)str[i]);
 		hash_value = (hash_value + (c - 'a' + 1) * power) % m;
 		power = (power * p) % m;
 	}
@@ -47,7 +43,7 @@ int containsKey(char str[]){
 void display(char str[]){
 	long long hash_value = compute_hash(str);
 	if(strcmp(st[hash_value].data_type, "") == 0){
-		strcpy(st[hash_value].data_type, "--");
+		return;
 	}
 	if(containsKey(str)){
 		printf("%d\t%s\t\t%s\t\t%s         \t%s\t%d\n", st[hash_value].sno, st[hash_value].name, st[hash_value].return_type, st[hash_value].data_type, st[hash_value].type, st[hash_value].no_arguments);
@@ -77,7 +73,6 @@ int main(){
 			continue;
 		long long hash = compute_hash(curr.type);
 		if(containsKey(curr.type)){
-			printf("\n%s hello\n", curr.type);
 			continue;
 		}	
 		
