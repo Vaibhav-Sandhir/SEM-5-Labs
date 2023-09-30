@@ -28,7 +28,7 @@ void S(){
 			B();
 			if(str[curr] == 'e'){
 				curr++;
-				valid();
+				return;
 			}
 			else{
 				invalid();
@@ -63,7 +63,7 @@ void Aprime(){
 void B(){
 	if(str[curr] == 'd'){
 		curr++;
-		valid();
+		return;
 	}
 }
 
