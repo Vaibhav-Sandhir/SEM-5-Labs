@@ -31,7 +31,7 @@ void U(){
 		S();
 		if(str[curr] == ')'){
 			curr++;
-			valid();
+			return;
 		}
 		else{
 			invalid();
@@ -43,7 +43,7 @@ void U(){
 		S();
 		if(str[curr] == 'b'){
 			curr++;
-			valid();
+			return;
 		}
 		else{
 			invalid();
@@ -52,7 +52,7 @@ void U(){
 	
 	else if (str[curr] == 'd'){
 		curr++;
-		valid();
+		return;
 	}
 	
 	else{
