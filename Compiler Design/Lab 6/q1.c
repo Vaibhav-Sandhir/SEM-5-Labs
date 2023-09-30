@@ -22,11 +22,11 @@ void valid(){
 void S(){
 	if(str[curr] == 'a'){
 		curr++;
-		valid();
+		return;
 	}
 	else if(str[curr] == '>'){
 		curr++;
-		valid();
+		return;
 	}
 	else if(str[curr] == '('){
 		printf("hello");
@@ -34,7 +34,7 @@ void S(){
 		T();
 		if(str[curr] == ')'){
 			curr++;
-			valid();
+			return;
 		}
 		else{
 			invalid();
