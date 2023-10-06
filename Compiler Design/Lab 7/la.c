@@ -9,8 +9,8 @@ typedef struct Token{
     char name[256];
 } Token;
 
-int row = 0;
-int column = 0;
+int row = 1;
+int column = 1;
 FILE* file;
 
 char *keywords[] = { "auto", "break", "case", "char", "const", "continue", "default", "do", "double", "else", "enum", "extern", "float", "for", "goto","if", "int", "long", "register", "return",   "short", "signed", "sizeof", "static", "struct", "switch", "typedef", "union", "unsigned", "void", "volatile", "while"};
@@ -36,14 +36,7 @@ int isAlphabet(char c){
 }
 
 int isSpecialSymbol(char c){
-	return  (c == '(') ||
-		(c == ')') ||
-		(c == '{') ||
- 		(c == '}') ||
-		(c == ']') ||
-		(c == '[') ||
-		(c == ',') ||
-		(c == ';');
+	return c == '(' || c == ')' || c == '{' || c == '}' || c == ']' || c == '[' || c == ',' || c == ';';
 }
 
 int isLogop(char c){
@@ -54,14 +47,22 @@ int isArithmop(char c){
 	return c == '+' || c == '-' || c == '/' || c == '*';
 }
 
-Token makeToken(char type[], char* name){
+Token makeToken(char type[], int lb, int fp){
+	fseek(file, lb, SEEK_SET);
+	int n = fp - lb + 1;
+	char* str = (char*)malloc(sizeof(char) * (n));
+	for(int i = 0; i < n; i++){
+		char c = fgetc(file);
+		*(str + i) = c;
+	}
 	Token token;
 	token.row = row;
 	token.column = column;
 	strcpy(token.type, type);
-	strcpy(token.name, name);
+	strcpy(token.name, str);
 	return token;	
 }
+
 
 char* makeString(int lb, int fp){
 	fseek(file, lb, SEEK_SET);
@@ -79,12 +80,18 @@ Token getNextToken(){
 	int fp = lb;
 	char c = fgetc(file);
 	
+	if(c == EOF)
+		exit(0);
+	
+	if(c == '\n'){
+		row++;
+	}		
+	
 	while(c == ' ' || c == '\n'){
 		lb++;
 		fp++;
 		c = fgetc(file);
 	}
-	//printf("\n %d %d %c", lb, fp, c);
 	
 	if(isNumerical(c)){
 		c = fgetc(file);
@@ -93,8 +100,7 @@ Token getNextToken(){
 			c = fgetc(file);
 			fp++;
 		}
-		char* str = makeString(lb, fp - 1);
-		return makeToken("Numerical", str);
+		return makeToken("Numerical", lb, fp - 1);
 	}
 	else if(isAlphabet(c)){
 		c = fgetc(file);
@@ -105,16 +111,15 @@ Token getNextToken(){
 		}
 		char* str = makeString(lb, fp - 1);
 		if(isKeyword(str)){
-			return makeToken("KW", str);
+			return makeToken("KW", lb, fp - 1);
 		}
 		else{
-			return makeToken("id", str);
+			return makeToken("id", lb, fp - 1);
 		}
 	}
 	else if(isSpecialSymbol(c)){
 		fp++;
-		char* str = makeString(lb, fp - 1);
-		return makeToken("SC", str);	
+		return makeToken("SC", lb, fp - 1);	
 	}
 	else if(isRelop(c)){
 		char prev = c;
@@ -122,99 +127,78 @@ Token getNextToken(){
 		fp++;
 		if(prev == '>' && c == '='){
 			fp++;
-			char* str = makeString(lb, fp - 1);
-			return makeToken("RELOP:GTE", str);
+			return makeToken("RELOP:GTE", lb, fp - 1);
 		}
 		if(prev == '>' && !isRelop(c)){
-			char* str = makeString(lb, fp - 1);
-			return makeToken("RELOP:GT", str);
+			return makeToken("RELOP:GT", lb, fp - 1);
 		}
 		if(prev == '=' && c == '='){
 			fp++;
-			char* str = makeString(lb, fp - 1);
-			return makeToken("RELOP:EQ", str);
+			return makeToken("RELOP:EQ", lb, fp - 1);
 		}
 		if(prev == '!' && c == '='){
 			fp++;
-			char* str = makeString(lb, fp - 1);
-			return makeToken("RELOP:NEQ", str);
+			return makeToken("RELOP:NEQ", lb, fp - 1);
 		}
 		if(prev == '<' && c == '='){
 			fp++;
-			char* str = makeString(lb, fp - 1);
-			return makeToken("RELOP:LTE", str);
+			return makeToken("RELOP:LTE", lb, fp - 1);
 		}
 		if(prev == '<' && !isRelop(c)){
-			char* str = makeString(lb, fp - 1);
-			return makeToken("RELOP:LT", str);
+			return makeToken("RELOP:LT", lb, fp - 1);
 		}
 		if(prev == '!' && !isRelop(c)){
-			char* str = makeString(lb, fp - 1);
-			return makeToken("LOG:NOT", str);
+			return makeToken("LOG:NOT", lb, fp - 1);
 		}
 		if(prev == '=' && !isRelop(c)){
-			char* str = makeString(lb, fp - 1);
-			return makeToken("ASSGN:EQ", str);
+			return makeToken("ASSGN:EQ", lb, fp - 1);
 		}	
 	}
-	
 	else if(isLogop(c)){
 		char prev = c;
 		c = fgetc(file);
 		fp++;
 		if(prev == '&' && c == '&'){
 			fp++;
-			char* str = makeString(lb, fp - 1);
-			return makeToken("LOG:AND", str);
+			return makeToken("LOG:AND", lb, fp - 1);
 		}
 		if(prev == '&' && !isRelop(c)){
-			char* str = makeString(lb, fp - 1);
-			return makeToken("BIT:AND", str);
+			return makeToken("BIT:AND", lb, fp - 1);
 		}
 		if(prev == '|' && c == '|'){
 			fp++;
-			char* str = makeString(lb, fp - 1);
-			return makeToken("LOG:OR", str);
+			return makeToken("LOG:OR", lb, fp - 1);
 		}
 		if(prev == '|' && !isRelop(c)){
-			char* str = makeString(lb, fp - 1);
-			return makeToken("BIT:OR", str);
+			return makeToken("BIT:OR", lb, fp - 1);
 		}
 		if(prev == '^' && !isRelop(c)){
-			char* str = makeString(lb, fp - 1);
-			return makeToken("BIT:XOR", str);
+			return makeToken("BIT:XOR", lb, fp - 1);
 		}
 	}
-	
 	else if(isArithmop(c)){
 		char prev = c;
 		c = fgetc(file);
 		fp++;
 		if(prev == '+' && c == '+'){
 			fp++;
-			char* str = makeString(lb, fp - 1);
-			return makeToken("INC", str);
+			return makeToken("INC", lb, fp - 1);
 		}
 		if(prev == '-' && c == '-'){
 			fp++;
-			char* str = makeString(lb, fp - 1);
-			return makeToken("DEC", str);
+			return makeToken("DEC", lb, fp - 1);
 		}
 		if(prev == '+' && !isArithmop(c)){
-			char* str = makeString(lb, fp - 1);
-			return makeToken("ARITHM:ADD", str);
+			return makeToken("ARITHM:ADD", lb, fp - 1);
 		}
 		if(prev == '-' && !isArithmop(c)){
-			char* str = makeString(lb, fp - 1);
-			return makeToken("ARITHM:SUB", str);
+			return makeToken("ARITHM:SUB", lb, fp - 1);
 		}
 		if(prev == '*' && !isArithmop(c)){
-			char* str = makeString(lb, fp - 1);
-			return makeToken("ARITHM:MUL", str);
+			return makeToken("ARITHM:MUL", lb, fp - 1);
 		}
 		if(prev == '/' && !isArithmop(c)){
-			char* str = makeString(lb, fp - 1);
-			return makeToken("ARITHM:DIV", str);
+			return makeToken("ARITHM:DIV", lb, fp - 1);
 		}
 	}
 	
@@ -222,8 +206,8 @@ Token getNextToken(){
 
 void main(){
 	file = fopen("input.c", "r");
-	for(int i = 0; i < 33; i++){
+	while(1){
 		Token token = getNextToken();
-		printf("%s %s\n", token.type, token.name);
+		printf("<%s, %s, %d>\n", token.type, token.name, token.row);
 	}
 }
