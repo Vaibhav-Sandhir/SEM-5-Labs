@@ -15,11 +15,11 @@ int main(){
 	}
 	
 	else if(pid == 0){
-		execl("/home/student/Desktop/210905152_OS/Lab 3/q1", "q1", NULL);
+		execl("/home/ubuntu/Desktop/SEM-5-Labs/Operating System/Lab 3/q1", "q1", NULL);
 		exit(0);
 	}
 	else{
 		wait(&status);
-		printf("\nChild returned %d", status);
+		printf("\nChild returned s %d", status);
 	}
 }
