@@ -80,12 +80,8 @@ Token getNextToken(){
 	int fp = lb;
 	char c = fgetc(file);
 	
-	if(c == EOF)
-		exit(0);
-	
-	if(c == '\n'){
-		row++;
-	}		
+	if(c == '\n')
+		row++;	
 	
 	while(c == ' ' || c == '\n'){
 		lb++;
@@ -93,6 +89,10 @@ Token getNextToken(){
 		c = fgetc(file);
 	}
 	
+	if(c == EOF)
+		exit(0);
+	
+		
 	if(isNumerical(c)){
 		c = fgetc(file);
 		fp++;
@@ -202,12 +202,4 @@ Token getNextToken(){
 		}
 	}
 	
-}
-
-void main(){
-	file = fopen("input.c", "r");
-	while(1){
-		Token token = getNextToken();
-		printf("<%s, %s, %d>\n", token.type, token.name, token.row);
-	}
 }
