@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include "la.h"
 
 Token token;
 
@@ -75,18 +77,25 @@ void declarations(){
 	else{
 		invalid(";");
 	}
+	return;
 }
 
 void datatype(){
-	if(strcmp(token.name, "int") == 0)
+	if(strcmp(token.name, "int") == 0){
+		match();
 		return;
-	else if(strcmp(token.name, "char") == 0)
+	}
+	else if(strcmp(token.name, "char") == 0){
+		match();
 		return;
+	}
 	else
-		invalid("int/char");		
+		invalid("int/char");	
+		return;	
 }
 
 void identifier_list(){
+	printf("\n %s", token.type);
 	if(strcmp(token.type, "id") == 0){
 		match();
 		if(strcmp(token.name, ",") == 0){
@@ -103,9 +112,11 @@ void identifier_list(){
 	else{
 		invalid("id");
 	}
+	return;
 }
 
 void assign_stat(){
+	printf("hello");
 	if(strcmp(token.type, "id") == 0){
 		match();
 		if(strcmp(token.name, "=") == 0){
@@ -130,9 +141,11 @@ void assign_stat(){
 	else{
 		invalid("id");
 	}
+	return;
 }
 
 int main(){
+	initialize();
 	Program();
 	valid();
 }

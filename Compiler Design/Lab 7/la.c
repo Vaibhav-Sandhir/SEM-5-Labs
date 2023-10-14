@@ -1,13 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-typedef struct Token{	
-    int row;
-    int column;
-    char type[256];
-    char name[256];
-} Token;
+#include "la.h"
 
 int row = 1;
 int column = 1;
@@ -73,6 +67,10 @@ char* makeString(int lb, int fp){
 		*(str + i) = c;
 	}
 	return str;
+}
+
+void initialize(){
+	file = fopen("input.c", "r");
 }
 
 Token getNextToken(){
@@ -201,5 +199,4 @@ Token getNextToken(){
 			return makeToken("ARITHM:DIV", lb, fp - 1);
 		}
 	}
-	
 }
