@@ -4,6 +4,7 @@
 #include "la.h"
 
 Token token;
+FILE* file;
 
 void Program();
 void declarations();
@@ -24,20 +25,20 @@ void invalid(char* correct){
 	exit(0);
 }
 
-void match(){
-	token = getNextToken();
+void match(FILE* file){
+	token = getNextToken(file);
 }
 
 void Program(){
-	match();
+	match(file);
 	if(strcmp(token.name, "main") == 0){
-		match();
+		match(file);
 		if(strcmp(token.name, "(") == 0){
-			match();
+			match(file);
 			if(strcmp(token.name, ")") == 0){
-				match();
+				match(file);
 				if(strcmp(token.name, "{") == 0){
-					match();
+					match(file);
 					declarations();
 					assign_stat();
 					if(strcmp(token.name, "}") == 0){
@@ -68,7 +69,7 @@ void declarations(){
 	datatype();
 	identifier_list();
 	if(strcmp(token.name, ";") == 0){
-		match();
+		match(file);
 		if(strcmp(token.name, "int") == 0 || strcmp(token.name, "char") == 0){
 			declarations();
 		}
@@ -82,11 +83,11 @@ void declarations(){
 
 void datatype(){
 	if(strcmp(token.name, "int") == 0){
-		match();
+		match(file);
 		return;
 	}
 	else if(strcmp(token.name, "char") == 0){
-		match();
+		match(file);
 		return;
 	}
 	else
@@ -95,11 +96,10 @@ void datatype(){
 }
 
 void identifier_list(){
-	printf("\n %s", token.type);
 	if(strcmp(token.type, "id") == 0){
-		match();
+		match(file);
 		if(strcmp(token.name, ",") == 0){
-			match();
+			match(file);
 			identifier_list();
 		}
 		if(strcmp(token.type, "id") == 0){
@@ -116,14 +116,14 @@ void identifier_list(){
 }
 
 void assign_stat(){
-	printf("hello");
 	if(strcmp(token.type, "id") == 0){
-		match();
+		match(file);
 		if(strcmp(token.name, "=") == 0){
-			match();
+			match(file);
 			if(strcmp(token.type, "id") == 0 || strcmp(token.type, "NUM") == 0){
-				match();
+				match(file);
 				if(strcmp(token.name, ";") == 0){
+					match(file);
 					return;
 				}
 				else{
@@ -145,7 +145,7 @@ void assign_stat(){
 }
 
 int main(){
-	initialize();
+	file = fopen("input.c", "r");
 	Program();
 	valid();
 }

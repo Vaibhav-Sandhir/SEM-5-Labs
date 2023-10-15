@@ -5,7 +5,6 @@
 
 int row = 1;
 int column = 1;
-FILE* file;
 
 char *keywords[] = { "auto", "break", "case", "char", "const", "continue", "default", "do", "double", "else", "enum", "extern", "float", "for", "goto","if", "int", "long", "register", "return",   "short", "signed", "sizeof", "static", "struct", "switch", "typedef", "union", "unsigned", "void", "volatile", "while"};
 
@@ -41,7 +40,7 @@ int isArithmop(char c){
 	return c == '+' || c == '-' || c == '/' || c == '*';
 }
 
-Token makeToken(char type[], int lb, int fp){
+Token makeToken(FILE* file, char type[], int lb, int fp){
 	fseek(file, lb, SEEK_SET);
 	int n = fp - lb + 1;
 	char* str = (char*)malloc(sizeof(char) * (n));
@@ -58,7 +57,7 @@ Token makeToken(char type[], int lb, int fp){
 }
 
 
-char* makeString(int lb, int fp){
+char* makeString(FILE* file, int lb, int fp){
 	fseek(file, lb, SEEK_SET);
 	int n = fp - lb + 1;
 	char* str = (char*)malloc(sizeof(char) * (n));
@@ -69,11 +68,7 @@ char* makeString(int lb, int fp){
 	return str;
 }
 
-void initialize(){
-	file = fopen("input.c", "r");
-}
-
-Token getNextToken(){
+Token getNextToken(FILE* file){
 	int lb = ftell(file);
 	int fp = lb;
 	char c = fgetc(file);
@@ -98,7 +93,7 @@ Token getNextToken(){
 			c = fgetc(file);
 			fp++;
 		}
-		return makeToken("Numerical", lb, fp - 1);
+		return makeToken(file, "Numerical", lb, fp - 1);
 	}
 	else if(isAlphabet(c)){
 		c = fgetc(file);
@@ -107,17 +102,17 @@ Token getNextToken(){
 			c = getc(file);
 			fp++;
 		}
-		char* str = makeString(lb, fp - 1);
+		char* str = makeString(file, lb, fp - 1);
 		if(isKeyword(str)){
-			return makeToken("KW", lb, fp - 1);
+			return makeToken(file, "KW", lb, fp - 1);
 		}
 		else{
-			return makeToken("id", lb, fp - 1);
+			return makeToken(file, "id", lb, fp - 1);
 		}
 	}
 	else if(isSpecialSymbol(c)){
 		fp++;
-		return makeToken("SC", lb, fp - 1);	
+		return makeToken(file, "SC", lb, fp - 1);	
 	}
 	else if(isRelop(c)){
 		char prev = c;
@@ -125,31 +120,31 @@ Token getNextToken(){
 		fp++;
 		if(prev == '>' && c == '='){
 			fp++;
-			return makeToken("RELOP:GTE", lb, fp - 1);
+			return makeToken(file, "RELOP:GTE", lb, fp - 1);
 		}
 		if(prev == '>' && !isRelop(c)){
-			return makeToken("RELOP:GT", lb, fp - 1);
+			return makeToken(file, "RELOP:GT", lb, fp - 1);
 		}
 		if(prev == '=' && c == '='){
 			fp++;
-			return makeToken("RELOP:EQ", lb, fp - 1);
+			return makeToken(file, "RELOP:EQ", lb, fp - 1);
 		}
 		if(prev == '!' && c == '='){
 			fp++;
-			return makeToken("RELOP:NEQ", lb, fp - 1);
+			return makeToken(file, "RELOP:NEQ", lb, fp - 1);
 		}
 		if(prev == '<' && c == '='){
 			fp++;
-			return makeToken("RELOP:LTE", lb, fp - 1);
+			return makeToken(file, "RELOP:LTE", lb, fp - 1);
 		}
 		if(prev == '<' && !isRelop(c)){
-			return makeToken("RELOP:LT", lb, fp - 1);
+			return makeToken(file, "RELOP:LT", lb, fp - 1);
 		}
 		if(prev == '!' && !isRelop(c)){
-			return makeToken("LOG:NOT", lb, fp - 1);
+			return makeToken(file, "LOG:NOT", lb, fp - 1);
 		}
 		if(prev == '=' && !isRelop(c)){
-			return makeToken("ASSGN:EQ", lb, fp - 1);
+			return makeToken(file, "ASSGN:EQ", lb, fp - 1);
 		}	
 	}
 	else if(isLogop(c)){
@@ -158,20 +153,20 @@ Token getNextToken(){
 		fp++;
 		if(prev == '&' && c == '&'){
 			fp++;
-			return makeToken("LOG:AND", lb, fp - 1);
+			return makeToken(file, "LOG:AND", lb, fp - 1);
 		}
 		if(prev == '&' && !isRelop(c)){
-			return makeToken("BIT:AND", lb, fp - 1);
+			return makeToken(file, "BIT:AND", lb, fp - 1);
 		}
 		if(prev == '|' && c == '|'){
 			fp++;
-			return makeToken("LOG:OR", lb, fp - 1);
+			return makeToken(file, "LOG:OR", lb, fp - 1);
 		}
 		if(prev == '|' && !isRelop(c)){
-			return makeToken("BIT:OR", lb, fp - 1);
+			return makeToken(file, "BIT:OR", lb, fp - 1);
 		}
 		if(prev == '^' && !isRelop(c)){
-			return makeToken("BIT:XOR", lb, fp - 1);
+			return makeToken(file, "BIT:XOR", lb, fp - 1);
 		}
 	}
 	else if(isArithmop(c)){
@@ -180,23 +175,23 @@ Token getNextToken(){
 		fp++;
 		if(prev == '+' && c == '+'){
 			fp++;
-			return makeToken("INC", lb, fp - 1);
+			return makeToken(file, "INC", lb, fp - 1);
 		}
 		if(prev == '-' && c == '-'){
 			fp++;
-			return makeToken("DEC", lb, fp - 1);
+			return makeToken(file, "DEC", lb, fp - 1);
 		}
 		if(prev == '+' && !isArithmop(c)){
-			return makeToken("ARITHM:ADD", lb, fp - 1);
+			return makeToken(file, "ARITHM:ADD", lb, fp - 1);
 		}
 		if(prev == '-' && !isArithmop(c)){
-			return makeToken("ARITHM:SUB", lb, fp - 1);
+			return makeToken(file, "ARITHM:SUB", lb, fp - 1);
 		}
 		if(prev == '*' && !isArithmop(c)){
-			return makeToken("ARITHM:MUL", lb, fp - 1);
+			return makeToken(file, "ARITHM:MUL", lb, fp - 1);
 		}
 		if(prev == '/' && !isArithmop(c)){
-			return makeToken("ARITHM:DIV", lb, fp - 1);
+			return makeToken(file, "ARITHM:DIV", lb, fp - 1);
 		}
 	}
 }
