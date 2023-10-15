@@ -78,7 +78,6 @@ void declarations(){
 	else{
 		invalid(";");
 	}
-	return;
 }
 
 void datatype(){
@@ -90,9 +89,9 @@ void datatype(){
 		match(file);
 		return;
 	}
-	else
+	else{
 		invalid("int/char");	
-		return;	
+	}		
 }
 
 void identifier_list(){
