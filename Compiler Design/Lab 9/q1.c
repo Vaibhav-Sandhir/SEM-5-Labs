@@ -17,8 +17,8 @@ void valid(){
 
 void invalid(char* correct){
 	printf("\n---ERROR---");
-	printf("\nError at row %d", token.row);
-	printf("Expected: %s", correct);
+	printf("\nError at row %d %d", token.row, token.column);
+	printf("\nExpected: %s", correct);
 	exit(0);
 }
 
@@ -169,7 +169,6 @@ void statement(){
 		decision_stat();
 	}
 	else if(strcmp(token.name, "while") == 0 || strcmp(token.name, "for") == 0){
-		printf("ff");
 		looping_stat();
 	} 
 	else{
@@ -333,8 +332,38 @@ void dprime(){
 				invalid("}");
 			}
 		}
+		else if(strcmp(token.name, "if") == 0){
+			match(file);
+			if(strcmp(token.name, "(") == 0){
+				match(file);
+				expn();
+				if(strcmp(token.name, ")") == 0){
+					match(file);
+					if(strcmp(token.name, "{") == 0){
+						match(file);
+						statement_list();
+						if(strcmp(token.name, "}") == 0){
+							match(file);
+							dprime();
+						}
+						else{
+							invalid("}");
+						}
+					}			
+					else{
+						invalid("{");
+					}	
+				}
+				else{
+					invalid(")");
+				}
+			}
+			else{
+				invalid("(");
+			}
+		}
 		else{
-			invalid("{");
+			invalid("{ / if");
 		}
 	}
 	else{

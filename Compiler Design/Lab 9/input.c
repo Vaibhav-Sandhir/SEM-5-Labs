@@ -19,6 +19,9 @@ if(c>10)
 {
 c=c+1;
 }
+else if(c<10){
+c=c+1;
+}
 else
 {
 c=c-1;

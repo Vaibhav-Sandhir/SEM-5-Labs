@@ -4,7 +4,7 @@
 #include "la.h"
 
 int row = 1;
-int column = 1;
+int column = 0;
 
 char *keywords[] = { "auto", "break", "case", "char", "const", "continue", "default", "do", "double", "else", "enum", "extern", "float", "for", "goto","if", "int", "long", "register", "return",   "short", "signed", "sizeof", "static", "struct", "switch", "typedef", "union", "unsigned", "void", "volatile", "while"};
 
@@ -53,6 +53,7 @@ Token makeToken(FILE* file, char type[], int lb, int fp){
 	token.column = column;
 	strcpy(token.type, type);
 	strcpy(token.name, str);
+	column = column + fp - lb;	
 	return token;	
 }
 
@@ -73,20 +74,26 @@ Token getNextToken(FILE* file){
 	int fp = lb;
 	char c = fgetc(file);
 	
-	if(c == '\n')
-		row++;	
-	
-	while(c == ' ' || c == '\n'){
+	if(c == '\n'){
+		row++;
+		column = 0;
 		lb++;
 		fp++;
+		c = fgetc(file);
+	}		
+	
+	while(c == ' '){
+		lb++;
+		fp++;
+		column++;
 		c = fgetc(file);
 	}
 	
 	if(c == EOF)
 		exit(0);
 	
-		
 	if(isNumerical(c)){
+		column++;
 		c = fgetc(file);
 		fp++;
 		while(isNumerical(c)){
@@ -96,6 +103,7 @@ Token getNextToken(FILE* file){
 		return makeToken(file, "Numerical", lb, fp - 1);
 	}
 	else if(isAlphabet(c)){
+		column++;
 		c = fgetc(file);
 		fp++;
 		while(isNumerical(c) || isAlphabet(c)){
@@ -111,10 +119,12 @@ Token getNextToken(FILE* file){
 		}
 	}
 	else if(isSpecialSymbol(c)){
+		column++;
 		fp++;
 		return makeToken(file, "SC", lb, fp - 1);	
 	}
 	else if(isRelop(c)){
+		column++;
 		char prev = c;
 		c = fgetc(file);
 		fp++;
@@ -148,6 +158,7 @@ Token getNextToken(FILE* file){
 		}	
 	}
 	else if(isLogop(c)){
+		column++;
 		char prev = c;
 		c = fgetc(file);
 		fp++;
@@ -170,6 +181,7 @@ Token getNextToken(FILE* file){
 		}
 	}
 	else if(isArithmop(c)){
+		column++;
 		char prev = c;
 		c = fgetc(file);
 		fp++;
