@@ -271,7 +271,7 @@ void addop(){
 }
 
 void mulop(){
-	if(strstr(token.type, "MUL") != NULL || strstr(token.type, "DIV") != NULL){
+	if(strstr(token.type, "MUL") != NULL || strstr(token.type, "DIV") != NULL || strstr(token.type, "MOD") != NULL){
 		match(file);
 		return;
 	}

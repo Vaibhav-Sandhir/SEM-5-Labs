@@ -92,6 +92,17 @@ Token getNextToken(FILE* file){
 	if(c == EOF)
 		exit(0);
 	
+	if(c == '"'){
+		column++;
+		c = fgetc(file);
+		fp++;
+		while(c != '"'){
+			c = fgetc(file);
+			fp++;
+		}
+		return makeToken(file, "String Literal", lb, fp - 1);
+	}	
+	
 	if(isNumerical(c)){
 		column++;
 		c = fgetc(file);
@@ -204,6 +215,9 @@ Token getNextToken(FILE* file){
 		}
 		if(prev == '/' && !isArithmop(c)){
 			return makeToken(file, "ARITHM:DIV", lb, fp - 1);
+		}
+		if(prev == '%' && !isArithmop(c)){
+			return makeToken(file, "ARITHM:MOD", lb, fp - 1);
 		}
 	}
 }
